@@ -36,6 +36,28 @@ except Exception:
     _HAS_GPD = False
 
 st.set_page_config(page_title="Punjab WQ Dashboard", layout="wide")
+import hmac
+import streamlit as st
+
+def password_gate():
+    # Already logged in this session
+    if st.session_state.get("auth_ok", False):
+        return
+
+    st.title("Login")
+    pwd = st.text_input("Password", type="password")
+
+    if st.button("Enter"):
+        correct = st.secrets.get("APP_PASSWORD", "")
+        if correct and hmac.compare_digest(pwd, correct):
+            st.session_state["auth_ok"] = True
+            st.rerun()
+        else:
+            st.error("Wrong password.")
+
+    st.stop()
+
+password_gate()
 
 # Responsive layout + fixed header spacing + heading font sizes + logo styling
 st.markdown(
@@ -1067,3 +1089,4 @@ if mode == "Dashboard":
     dashboard_mode()
 else:
     comparison_mode()
+
